@@ -1,0 +1,50 @@
+{
+    "update_id": 704049904,
+    "message": {
+        "message_id": 48,
+        "from": {
+            "id": 282618744,
+            "is_bot": false,
+            "first_name": "Vlad",
+            "last_name": "Kuznetsov",
+            "language_code": "ru"
+        },
+        "chat": {
+            "id": 282618744,
+            "first_name": "Vlad",
+            "last_name": "Kuznetsov",
+            "type": "private"
+        },
+        "date": 1629371458,
+        "photo": [
+            {
+                "file_id": "AgACAgIAAxkBAAMwYR48QnQCYf4orAi86Bj32XN6z-MAAkO1MRv3_PFIWYt4q0lDjF0BAAMCAANzAAMgBA",
+                "file_unique_id": "AQADQ7UxG_f88Uh4",
+                "file_size": 1204,
+                "width": 51,
+                "height": 90
+            },
+            {
+                "file_id": "AgACAgIAAxkBAAMwYR48QnQCYf4orAi86Bj32XN6z-MAAkO1MRv3_PFIWYt4q0lDjF0BAAMCAANtAAMgBA",
+                "file_unique_id": "AQADQ7UxG_f88Uhy",
+                "file_size": 13879,
+                "width": 180,
+                "height": 320
+            },
+            {
+                "file_id": "AgACAgIAAxkBAAMwYR48QnQCYf4orAi86Bj32XN6z-MAAkO1MRv3_PFIWYt4q0lDjF0BAAMCAAN4AAMgBA",
+                "file_unique_id": "AQADQ7UxG_f88Uh9",
+                "file_size": 54400,
+                "width": 449,
+                "height": 800
+            },
+            {
+                "file_id": "AgACAgIAAxkBAAMwYR48QnQCYf4orAi86Bj32XN6z-MAAkO1MRv3_PFIWYt4q0lDjF0BAAMCAAN5AAMgBA",
+                "file_unique_id": "AQADQ7UxG_f88Uh-",
+                "file_size": 65913,
+                "width": 719,
+                "height": 1280
+            }
+        ]
+    }
+}
