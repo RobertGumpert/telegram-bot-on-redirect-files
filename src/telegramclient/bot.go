@@ -1,10 +1,11 @@
-package telegram
+package telegramclient
 
 import (
 	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"runtime"
@@ -76,11 +77,61 @@ func (this *Bot) InitWebhook(host string, engine *gin.Engine) (*http.Response, e
 	return nil, nil
 }
 
-func (this *Bot) ISWebhookTransport() bool {
-	if this.webhookEndpoint != "" {
-		return true
+func (this *Bot) GetFilePath(fileUniqueId string) (string, error) {
+	url := fmt.Sprintf(
+		"https://api.telegram.org/bot%s/getFile?file_id=%s",
+		this.token,
+		fileUniqueId,
+	)
+	response, err := http.Get(
+		url,
+	)
+	defer response.Body.Close()
+	if err != nil {
+		return "", err
 	}
-	return false
+	var (
+		getFileResult = new(jsonGetFile)
+	)
+	err = json.NewDecoder(response.Body).Decode(getFileResult)
+	log.Println(*getFileResult)
+	if err != nil {
+		return "", err
+	}
+	if !getFileResult.OK {
+		return "", errors.New(fmt.Sprintf(
+			"Get file with ID : [%s] has non result",
+			fileUniqueId,
+		))
+	}
+	if getFileResult.Result == nil || getFileResult.Result.FilePath == "" {
+		return "", errors.New(fmt.Sprintf(
+			"Get file with ID : [%s] has non result",
+			fileUniqueId,
+		))
+	}
+	return getFileResult.Result.FilePath, nil
+}
+
+func (this *Bot) DownloadFile(filePath string) (io.Reader, error) {
+	url := fmt.Sprintf(
+		"https://api.telegram.org/bot%s/%s",
+		this.token,
+		filePath,
+	)
+	response, err := http.Get(
+		url,
+	)
+	defer response.Body.Close()
+	if err != nil {
+		return nil, err
+	}
+	var buffer bytes.Buffer
+	err = response.Write(&buffer)
+	if err != nil {
+		return nil, err
+	}
+	return bytes.NewReader(buffer.Bytes()), nil
 }
 
 func (this *Bot) getWebhookUpdate(engine *gin.Engine) {

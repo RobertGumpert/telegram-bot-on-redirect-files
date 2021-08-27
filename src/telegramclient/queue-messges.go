@@ -1,4 +1,4 @@
-package telegram
+package telegramclient
 
 import (
 	"errors"

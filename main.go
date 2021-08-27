@@ -2,9 +2,11 @@ package main
 
 import (
 	"application/src/config"
-	"application/src/telegram"
+	"application/src/dropboxclient"
+	"application/src/telegramclient"
 	"log"
 	"runtime"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -13,28 +15,50 @@ const (
 	SetWebHookEndpoint = "setWebhook"
 )
 
+var (
+	bot     *telegramclient.Bot
+	dropbox *dropboxclient.DropboxClientWrapper
+)
+
 func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
-	env, err := config.ReadENV()
+	env, err := config.Reader(config.Production, config.Env)
 	if err != nil {
 		log.Fatal(err)
 	}
-	engine, run := getServerEngine(env.AppPort)
-	bot := telegram.NewBot(env.TgToken, messageReceiver)
-	_, err = bot.InitWebhook(env.Host, engine)
+	dropbox = dropboxclient.NewDropboxClient(env.DropboxToken)
+	engine, run := getServerEngine(env.ApplicationPort)
+	bot = telegramclient.NewBot(env.TelegramToken, messageReceiver)
+	_, err = bot.InitWebhook(env.ApplicationHost, engine)
 	if err != nil {
 		log.Fatal(err)
 	}
 	run()
 }
 
-func messageReceiver(message telegram.ClientMessage, err error) telegram.QueueMessagesDoPop {
+func messageReceiver(message telegramclient.ClientMessage, err error) telegramclient.QueueMessagesDoPop {
 	if err != nil {
 		log.Println(err)
-		return telegram.QueueMessagesDoPop(false)
+		return telegramclient.QueueMessagesDoPop(false)
 	}
 	log.Println(*message.Message.Document)
-	return telegram.QueueMessagesDoPop(true)
+	filePath, err := bot.GetFilePath(message.Message.Document.FileID)
+	if err != nil {
+		panic(err)
+	}
+	ioReader, err := bot.DownloadFile(filePath)
+	if err != nil {
+		panic(err)
+	}
+	meta, err := dropbox.Upload(
+		message.Message.Document.FileName,
+		ioReader,
+	)
+	if err != nil {
+		panic(err)
+	}
+	log.Println(meta)
+	return telegramclient.QueueMessagesDoPop(true)
 }
 
 func getServerEngine(port string) (*gin.Engine, func()) {
